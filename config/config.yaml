@@ -1,0 +1,43 @@
+# EV Battery Prediction Configuration
+
+# Data Configuration
+data:
+  raw_data_path: "data/raw"
+  processed_data_path: "data/processed"
+  train_split: 0.7
+  val_split: 0.15
+  test_split: 0.15
+  sequence_length: 50  # Time steps for LSTM/GRU
+  features: ["voltage", "current", "temperature", "cycle_count", "capacity"]
+
+# Model Configuration
+model:
+  type: "lstm"  # Options: "lstm", "gru", "bilstm"
+  input_size: 5  # Number of features
+  hidden_size: 128
+  num_layers: 2
+  dropout: 0.2
+  bidirectional: false
+  output_size: 3  # SOH, Range, Degradation Rate
+
+# Training Configuration
+training:
+  batch_size: 32
+  num_epochs: 100
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  early_stopping_patience: 10
+  device: "cuda"  # "cuda" or "cpu"
+  
+# Evaluation Configuration
+evaluation:
+  metrics: ["rmse", "mae", "r2", "mape"]
+  save_predictions: true
+  plot_results: true
+
+# Paths
+paths:
+  model_save_dir: "models"
+  log_dir: "logs"
+  results_dir: "results"
+
