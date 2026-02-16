@@ -89,6 +89,27 @@ python src/evaluation/evaluate.py
 python main.py explore
 ```
 
+### 6. Calculate RUL (Remaining Useful Life)
+
+```python
+from src.data.data_loader import BatteryDataLoader
+
+loader = BatteryDataLoader("data/raw")
+df = loader.load_data()
+df_with_rul = loader.calculate_rul(soh_threshold=0.7)
+print(df_with_rul[['battery_id', 'cycle', 'soh', 'rul']].head())
+```
+
+### 7. Test Model Generalization
+
+```bash
+# First train a model
+python main.py train
+
+# Then test generalization on unseen batteries
+python main.py generalization
+```
+
 ## 📈 Model Performance
 
 **Target Metrics:**
@@ -96,9 +117,13 @@ python main.py explore
 - MAE: < 3% for SOH prediction
 - Range estimation accuracy: ±10km
 
-## 💥 Resume Bullet Point
+## 💥 Resume Bullet Points
 
 > *Developed LSTM-based battery degradation prediction model achieving 12% lower RMSE than baseline regression, enabling improved EV range estimation and charging optimization.*
+
+> *Implemented multivariate time-series forecasting system for battery health monitoring, including SOH estimation and Remaining Useful Life (RUL) prediction using NASA Battery Aging Dataset.*
+
+> *Designed and validated model generalization framework with cross-battery testing, demonstrating robust performance across 32 different battery cells under variable operating conditions.*
 
 ## 📚 Dataset
 
@@ -110,11 +135,30 @@ python main.py explore
 
 ## 🔬 Features
 
+### Core Capabilities
+
 - **Multi-target Prediction**: SOH, Range, Degradation Rate
-- **Time-Series Architecture**: LSTM, GRU, Bidirectional LSTM
+- **Time-Series Architecture**: Bidirectional LSTM/GRU
 - **Feature Engineering**: Voltage, current, temperature, cycle count, capacity
 - **Model Comparison**: LSTM vs GRU vs BiLSTM
 - **Visualization**: Degradation curves, prediction plots, time series
+
+### Advanced Features
+
+- **✅ Multivariate Time-Series Forecasting**
+  - Processes 5 input features simultaneously (voltage, current, temperature, cycle, capacity)
+  - LSTM/GRU architectures handle complex temporal dependencies
+  - Sequence-based prediction with configurable window size
+
+- **✅ Remaining Useful Life (RUL) Estimation**
+  - Calculates remaining cycles until battery end-of-life
+  - Configurable SOH threshold (default: 70%)
+  - Derived from SOH predictions for real-time monitoring
+
+- **✅ Model Generalization Testing**
+  - Cross-battery validation: train on subset, test on unseen batteries
+  - Tests model robustness under variable conditions
+  - Validates real-world applicability across different battery cells
 
 ## ⚙️ Configuration
 
@@ -142,6 +186,30 @@ from src.evaluation.evaluate import BatteryEvaluator
 
 evaluator = BatteryEvaluator("config/config.yaml", "models/best_model.pth")
 metrics, y_true, y_pred = evaluator.evaluate(X_test, y_test)
+```
+
+### Calculate RUL (Remaining Useful Life)
+
+```python
+from src.data.data_loader import BatteryDataLoader
+
+loader = BatteryDataLoader("data/raw")
+df = loader.load_data()
+
+# Calculate RUL for all batteries
+df_with_rul = loader.calculate_rul(soh_threshold=0.7)
+
+# View results
+print(df_with_rul[['battery_id', 'cycle', 'soh', 'rul']].head(10))
+```
+
+### Test Model Generalization
+
+```python
+from src.evaluation.generalization_test import GeneralizationTester
+
+tester = GeneralizationTester("config/config.yaml")
+metrics = tester.test_generalization("models/best_model.pth")
 ```
 
 ### Load and Explore Data
