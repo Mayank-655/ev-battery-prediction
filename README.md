@@ -229,6 +229,67 @@ Explore the data interactively:
 jupyter notebook notebooks/01_data_exploration.ipynb
 ```
 
+## 🚀 Deployment Options
+
+### 1. Flask REST API
+
+```bash
+cd api
+pip install -r requirements.txt
+python app.py
+```
+
+API available at `http://localhost:5000`
+
+**Endpoints:**
+- `GET /health` - Health check
+- `GET /model_info` - Model information
+- `POST /predict` - Single prediction
+- `POST /predict_batch` - Batch predictions
+
+### 2. Streamlit Dashboard
+
+```bash
+cd dashboard
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+Dashboard available at `http://localhost:8501`
+
+**Features:**
+- Interactive data exploration
+- Real-time predictions
+- Model performance visualization
+- Settings and configuration
+
+### 3. AWS Deployment
+
+Multiple deployment options available:
+- **Docker**: Containerized deployment
+- **EC2**: Direct server deployment
+- **ECS/Fargate**: Container orchestration
+- **Elastic Beanstalk**: Managed deployment
+
+See `deployment/DEPLOYMENT.md` for detailed instructions.
+
+### Quick Start Examples
+
+**Flask API:**
+```python
+import requests
+
+response = requests.post('http://localhost:5000/predict', json={
+    'features': [[3.7, -2.0, 25.0, 1, 2.0], ...]
+})
+print(response.json())
+```
+
+**Streamlit:**
+- Interactive web interface
+- No coding required
+- Upload CSV or select from dataset
+
 ## 📝 License
 
 MIT License - Feel free to use for your portfolio!
