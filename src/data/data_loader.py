@@ -372,6 +372,44 @@ class BatteryDataLoader:
         targets = self.data[['soh', 'range_km', 'degradation_rate']].values
         return targets
     
+    def calculate_rul(self, soh_threshold: float = 0.7) -> pd.DataFrame:
+        """
+        Calculate Remaining Useful Life (RUL) for each battery
+        
+        Args:
+            soh_threshold: SOH threshold below which battery is considered end-of-life
+            
+        Returns:
+            DataFrame with RUL added
+        """
+        if self.data is None:
+            raise ValueError("Data not loaded. Call load_data() first.")
+        
+        df = self.data.copy()
+        df['rul'] = np.nan
+        
+        for battery_id in df['battery_id'].unique():
+            battery_data = df[df['battery_id'] == battery_id].copy()
+            battery_data = battery_data.sort_values('cycle')
+            
+            # Find where SOH drops below threshold
+            eol_cycle = battery_data[battery_data['soh'] <= soh_threshold]['cycle']
+            
+            if len(eol_cycle) > 0:
+                eol_cycle = eol_cycle.iloc[0]  # First cycle below threshold
+                # RUL = cycles until EOL
+                battery_data['rul'] = eol_cycle - battery_data['cycle']
+                battery_data['rul'] = battery_data['rul'].clip(lower=0)  # No negative RUL
+            else:
+                # If never reaches threshold, RUL is cycles remaining to max cycle
+                max_cycle = battery_data['cycle'].max()
+                battery_data['rul'] = max_cycle - battery_data['cycle']
+            
+            df.loc[df['battery_id'] == battery_id, 'rul'] = battery_data['rul'].values
+        
+        self.data = df
+        return df
+    
     def save_processed_data(self, output_path: str):
         """
         Save processed data to file

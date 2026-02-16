@@ -92,6 +92,21 @@ def explore_data():
     return df
 
 
+def test_generalization(config_path: str = "config/config.yaml",
+                        model_path: str = "models/best_model.pth"):
+    """Test model generalization across different batteries"""
+    print("="*60)
+    print("EV BATTERY DEGRADATION PREDICTION - GENERALIZATION TEST")
+    print("="*60)
+    
+    from src.evaluation.generalization_test import GeneralizationTester
+    
+    tester = GeneralizationTester(config_path)
+    metrics = tester.test_generalization(model_path)
+    
+    return metrics
+
+
 def main():
     """Main function"""
     parser = argparse.ArgumentParser(
@@ -99,8 +114,8 @@ def main():
     )
     parser.add_argument(
         'mode',
-        choices=['train', 'evaluate', 'explore'],
-        help='Mode: train, evaluate, or explore data'
+        choices=['train', 'evaluate', 'explore', 'generalization'],
+        help='Mode: train, evaluate, explore data, or test generalization'
     )
     parser.add_argument(
         '--config',
@@ -123,6 +138,8 @@ def main():
         evaluate_model(args.config, args.model)
     elif args.mode == 'explore':
         explore_data()
+    elif args.mode == 'generalization':
+        test_generalization(args.config, args.model)
 
 
 if __name__ == "__main__":
